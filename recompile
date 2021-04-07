@@ -1,0 +1,2 @@
+pyuic5 volumize/ui/mainwindow.ui -o volumize/MainWindow.py
+perl -pi -e 's/import resources_rc/from . import resources_rc/g' volumize/MainWindow.py
