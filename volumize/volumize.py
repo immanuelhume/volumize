@@ -1,5 +1,8 @@
+# TODO drag and drop into file list view
+# TODO open file explorer upon completion option
+
 from PyQt5.QtWidgets import *
-from PyQt5.QtCore import Qt, QAbstractListModel, QRunnable, QThreadPool, pyqtSlot, QObject, pyqtSignal
+from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 
 import os
@@ -25,6 +28,7 @@ class MainWindow(QMainWindow):
         icon_folder_open = QIcon((str(icons_dir / 'folder-open.png')))
 
         self.setWindowTitle('Volumizer')
+        # self.setAttribute(Qt.WA_TranslucentBackground)
 
         main_layout = QHBoxLayout()
 
