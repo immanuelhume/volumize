@@ -132,4 +132,6 @@ class Ui_MainWindow(object):
         self.doubleSpinBox_volumeNo.setToolTip(_translate("MainWindow", "<html><head/><body><p>Volume number for current selection</p></body></html>"))
         self.pushButton_compile.setToolTip(_translate("MainWindow", "<html><head/><body><p>Archive the selected chapters</p></body></html>"))
         self.pushButton_compile.setText(_translate("MainWindow", "Compile"))
+
+
 from . import resources_rc
