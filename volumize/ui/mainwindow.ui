@@ -40,7 +40,7 @@
          <item row="0" column="0">
           <widget class="QLabel" name="label_inputFolder">
            <property name="text">
-            <string>Select Folder:</string>
+            <string>Select folder:</string>
            </property>
           </widget>
          </item>
@@ -54,7 +54,7 @@
          <item row="3" column="0">
           <widget class="QLabel" name="label_mangaTitle">
            <property name="text">
-            <string>Manga Title:</string>
+            <string>Manga title:</string>
            </property>
           </widget>
          </item>
@@ -91,7 +91,7 @@
          <item row="1" column="0">
           <widget class="QLabel" name="label_outputFolder">
            <property name="text">
-            <string>Output Folder:</string>
+            <string>Save to:</string>
            </property>
           </widget>
          </item>

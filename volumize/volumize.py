@@ -1,6 +1,5 @@
 # TODO drag and drop into file list view
 # TODO open file explorer upon completion option
-# TODO filter out files to folders only
 # TODO implement reverse engineering - unpack
 
 
@@ -17,7 +16,7 @@ from PyQt5.QtWidgets import *
 from .MainWindow import Ui_MainWindow
 
 
-def natural_sort_key(s, _nsre=re.compile('([0-9]+)')):
+def natural_sort_key(s: str, _nsre=re.compile('([0-9]+)')) -> List:
     return [int(text) if text.isdigit() else text.lower()
             for text in _nsre.split(s)]
 
@@ -35,7 +34,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.label_outputFolder,
             self.lineEdit_outputFolder,
             self.pushButton_outputFolder,
-            self.label_inputFolder,
             self.label_mangaTitle,
             self.lineEdit_mangaTitle,
             self.checkBox_showFiles,
@@ -59,7 +57,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.pushButton_compile.clicked.connect(self.handle_compile)
 
     @staticmethod
-    def toggle_enabled(*widgets):
+    def toggle_enabled(*widgets: List):
         for widget in widgets:
             widget.setEnabled(not widget.isEnabled())
 
@@ -116,7 +114,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             toCbzWorker.signals.completed.connect(self.one_volume_done)
             self.threadpool.start(toCbzWorker)
 
-    def one_volume_done(self):
+    def one_volume_done(self, msg):
+        self.statusBar.showMessage(msg)
         self.progressBar.reset()
         self.doubleSpinBox_volumeNo.setValue(
             self.doubleSpinBox_volumeNo.value() + 1)
@@ -124,7 +123,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
 class ToCbzWorkerSignals(QObject):
 
-    completed = pyqtSignal()
+    completed = pyqtSignal(str)
     progress = pyqtSignal(int)
 
 
@@ -136,7 +135,7 @@ class ToCbzWorker(QRunnable):
         self.destination = destination
         self.signals = ToCbzWorkerSignals()
 
-    @ pyqtSlot()
+    @pyqtSlot()
     def run(self):
         cbz_file = zipfile.ZipFile(self.destination, 'w')
         files = [(folder.name, file) for folder in self.folders
@@ -146,7 +145,7 @@ class ToCbzWorker(QRunnable):
             self.signals.progress.emit(int((100 * n) / total_n))
             cbz_file.write(page, Path(chapter) / page.name)
         cbz_file.close()
-        self.signals.completed.emit()
+        self.signals.completed.emit(f'{self.destination.name} created!')
 
 
 class FilesModel(QAbstractListModel):

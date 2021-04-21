@@ -119,11 +119,11 @@ class Ui_MainWindow(object):
         MainWindow.setWindowTitle(_translate("MainWindow", "Volumize"))
         self.lineEdit_outputFolder.setToolTip(_translate("MainWindow", "<html><head/><body><p>Full path to where you\'d like to store the CBZ archives</p></body></html>"))
         self.lineEdit_mangaTitle.setToolTip(_translate("MainWindow", "<html><head/><body><p>Manga title, used to name the CBZ archives</p></body></html>"))
-        self.label_inputFolder.setText(_translate("MainWindow", "Select Folder:"))
+        self.label_inputFolder.setText(_translate("MainWindow", "Select folder:"))
         self.lineEdit_inputFolder.setToolTip(_translate("MainWindow", "<html><head/><body><p>Full path to the folder containing manga</p></body></html>"))
-        self.label_mangaTitle.setText(_translate("MainWindow", "Manga Title:"))
+        self.label_mangaTitle.setText(_translate("MainWindow", "Manga title:"))
         self.pushButton_outputFolder.setToolTip(_translate("MainWindow", "<html><head/><body><p>Select a folder to store the CBZ archives</p></body></html>"))
-        self.label_outputFolder.setText(_translate("MainWindow", "Output Folder:"))
+        self.label_outputFolder.setText(_translate("MainWindow", "Save to:"))
         self.pushButton_inputFolder.setToolTip(_translate("MainWindow", "<html><head/><body><p>Select a folder containing the manga to archive</p></body></html>"))
         self.checkBox_showFiles.setToolTip(_translate("MainWindow", "<html><head/><body><p>Opens the file location after archiving</p></body></html>"))
         self.checkBox_showFiles.setText(_translate("MainWindow", "Show files in folder when complete"))
@@ -132,6 +132,4 @@ class Ui_MainWindow(object):
         self.doubleSpinBox_volumeNo.setToolTip(_translate("MainWindow", "<html><head/><body><p>Volume number for current selection</p></body></html>"))
         self.pushButton_compile.setToolTip(_translate("MainWindow", "<html><head/><body><p>Archive the selected chapters</p></body></html>"))
         self.pushButton_compile.setText(_translate("MainWindow", "Compile"))
-
-
 from . import resources_rc
