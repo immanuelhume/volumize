@@ -1,6 +1,8 @@
 # TODO drag and drop into file list view
 # TODO open file explorer upon completion option
-# TODO disable all fields except select folder
+# TODO filter out files to folders only
+# TODO implement reverse engineering - unpack
+
 
 import os
 import re
@@ -20,11 +22,6 @@ def natural_sort_key(s, _nsre=re.compile('([0-9]+)')):
             for text in _nsre.split(s)]
 
 
-def toggle_enabled(*widgets):
-    for widget in widgets:
-        widget.setEnabled(not widget.isEnabled())
-
-
 class MainWindow(QMainWindow, Ui_MainWindow):
 
     def __init__(self):
@@ -32,23 +29,26 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         super().__init__()
         self.setupUi(self)
         self.show()
+        self.threadpool = QThreadPool()
 
-        # disable everything except select folder
-        toggle_enabled(
-            self.label_3,
+        self.locked_widgets = [
+            self.label_outputFolder,
             self.lineEdit_outputFolder,
             self.pushButton_outputFolder,
-            self.label_4,
+            self.label_inputFolder,
+            self.label_mangaTitle,
             self.lineEdit_mangaTitle,
             self.checkBox_showFiles,
-            self.label,
+            self.label_volumeNo,
             self.doubleSpinBox_volumeNo,
             self.listView_chapters,
             self.pushButton_compile,
             self.progressBar
-        )
+        ]
 
-        self.threadpool = QThreadPool()
+        # disable everything until a folder is selected
+        self.toggle_enabled(*self.locked_widgets)
+        self.lineEdit_inputFolder.textChanged.connect(self.enable_all)
 
         self.pushButton_inputFolder.clicked.connect(self.select_input_folder)
         self.pushButton_outputFolder.clicked.connect(self.select_output_folder)
@@ -57,6 +57,18 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.listView_chapters.setModel(self.files_model)
 
         self.pushButton_compile.clicked.connect(self.handle_compile)
+
+    @staticmethod
+    def toggle_enabled(*widgets):
+        for widget in widgets:
+            widget.setEnabled(not widget.isEnabled())
+
+    def enable_all(self):
+        # check if it's a valid path
+        input_folder = self.lineEdit_inputFolder.text()
+        if (os.path.isdir(input_folder)):
+            for widget in self.locked_widgets:
+                widget.setEnabled(True)
 
     def select_input_folder(self):
         dir_to_open = self.lineEdit_inputFolder.text() or str(Path.home())
@@ -68,8 +80,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.lineEdit_mangaTitle.setText(Path(input_folder).name)
 
             self.files_model.dirname = Path(input_folder)
-            self.files_model.files = sorted(os.listdir(
-                input_folder), key=natural_sort_key)
+            chapters = [item for item in os.listdir(input_folder) if
+                        os.path.isdir(Path(input_folder) / item)]
+            self.files_model.files = sorted(chapters, key=natural_sort_key)
             self.files_model.layoutChanged.emit()
 
     def select_output_folder(self):
@@ -157,7 +170,3 @@ def main():
     app = QApplication([])
     window = MainWindow()
     app.exec_()
-
-
-if __name__ == '__main__':
-    pass
