@@ -1,5 +1,6 @@
 import os
 import re
+import shutil
 import zipfile
 from pathlib import Path
 from typing import List
@@ -14,8 +15,22 @@ def to_cbz(chapters: List['Path'],
            dest: 'Path',
            signals: 'ToCbzWorkerSignals' = None):
     cbz_file = zipfile.ZipFile(dest, 'w')
-    pages = [(folder.name, file) for folder in chapters
-             for file in os.scandir(folder)]
+    pages = []
+    tmp_folder = dest.parent / 'tmp'
+    os.mkdir(tmp_folder)
+    os.chdir(tmp_folder)
+
+    for chapter in chapters:
+        if chapter.is_dir():
+            pages.extend([(chapter.name, file)
+                          for file in os.scandir(chapter)])
+        else:
+            # extract file contents first
+            with zipfile.ZipFile(chapter, 'r') as zf:
+                zf.extractall(tmp_folder)
+            pages.extend([(chapter.stem, file)
+                          for file in os.scandir(tmp_folder / chapter.stem)])
+
     total_n = len(pages)
     for n, (chapter, page) in enumerate(pages):
         cbz_file.write(page, Path(chapter) / page.name)
@@ -24,3 +39,7 @@ def to_cbz(chapters: List['Path'],
     cbz_file.close()
     if signals:
         signals.completed.emit(f'{dest} created!')
+    shutil.rmtree(tmp_folder)
+
+
+valid_input_file_formats = ['.zip', '.cbz']
