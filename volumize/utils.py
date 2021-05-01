@@ -10,6 +10,8 @@ def natural_sort_key(s: str, _nsre=re.compile('([0-9]+)')) -> List:
     return [int(text) if text.isdigit() else text.lower()
             for text in _nsre.split(s)]
 
+# BUG the loading bar sucks
+
 
 def to_cbz(chapters: List['Path'],
            dest: 'Path',
@@ -20,7 +22,10 @@ def to_cbz(chapters: List['Path'],
     os.mkdir(tmp_folder)
     os.chdir(tmp_folder)
 
-    for chapter in chapters:
+    total_n = len(chapters)
+    for n, chapter in enumerate(chapters):
+        if signals:
+            signals.progress.emit(int((5 * n) / total_n))
         if chapter.is_dir():
             pages.extend([(chapter.name, file)
                           for file in os.scandir(chapter)])
@@ -35,7 +40,7 @@ def to_cbz(chapters: List['Path'],
     for n, (chapter, page) in enumerate(pages):
         cbz_file.write(page, Path(chapter) / page.name)
         if signals:
-            signals.progress.emit(int(100 * n) / total_n)
+            signals.progress.emit(int(5 + (95 * n) / total_n))
     cbz_file.close()
     if signals:
         signals.completed.emit(f'{dest} created!')

@@ -9,6 +9,7 @@ import zipfile
 from pathlib import Path
 from typing import List
 
+from PyQt5 import uic
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
@@ -17,13 +18,15 @@ from .MainWindow import Ui_MainWindow
 from .utils import natural_sort_key, to_cbz, valid_input_file_formats
 
 
-class MainWindow(QMainWindow, Ui_MainWindow):
+class MainWindow(QMainWindow):
 
     def __init__(self):
 
         super().__init__()
-        self.setupUi(self)
+        uic.loadUi(f"{Path(__file__).parent / 'ui' / 'mainwindow.ui'}", self)
+        # self.setupUi(self)
         self.show()
+        self.lineEdit_inputFolder.setFocus()
         self.threadpool = QThreadPool()
 
         self.intially_locked_widgets = [
@@ -41,8 +44,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         ]
 
         # disable everything until a folder is selected
-        self.set_disabled()
-        self.lineEdit_inputFolder.textChanged.connect(self.set_enabled)
+        # self.set_disabled()
+        # self.lineEdit_inputFolder.textChanged.connect(self.set_enabled)
 
         self.pushButton_inputFolder.clicked.connect(self.select_input_folder)
         self.pushButton_outputFolder.clicked.connect(self.select_output_folder)
