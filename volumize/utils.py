@@ -5,14 +5,15 @@ import zipfile
 from pathlib import Path
 from typing import List
 
+# TODO remove the weird loading bar and add cool text instead
+
 
 def natural_sort_key(s: str, _nsre=re.compile('([0-9]+)')) -> List:
     return [int(text) if text.isdigit() else text.lower()
             for text in _nsre.split(s)]
 
+
 # BUG the loading bar sucks
-
-
 def to_cbz(chapters: List['Path'],
            dest: 'Path',
            signals: 'ToCbzWorkerSignals' = None):

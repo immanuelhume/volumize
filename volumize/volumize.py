@@ -1,6 +1,5 @@
 # TODO drag and drop into file list view
 # TODO open file explorer upon completion option
-# TODO implement reverse engineering - unpack
 
 
 import os
@@ -18,13 +17,13 @@ from .MainWindow import Ui_MainWindow
 from .utils import natural_sort_key, to_cbz, valid_input_file_formats
 
 
-class MainWindow(QMainWindow):
+class MainWindow(QMainWindow, Ui_MainWindow):
 
     def __init__(self):
 
         super().__init__()
-        uic.loadUi(f"{Path(__file__).parent / 'ui' / 'mainwindow.ui'}", self)
-        # self.setupUi(self)
+        # uic.loadUi(f"{Path(__file__).parent / 'ui' / 'mainwindow.ui'}", self)
+        self.setupUi(self)
         self.show()
         self.lineEdit_inputFolder.setFocus()
         self.threadpool = QThreadPool()
@@ -46,6 +45,10 @@ class MainWindow(QMainWindow):
         # disable everything until a folder is selected
         # self.set_disabled()
         # self.lineEdit_inputFolder.textChanged.connect(self.set_enabled)
+
+        self.listView_chapters.signals.dropped.\
+            connect(self.display_folder_contents)
+        self.listView_chapters.signals.error.connect(self.display_drop_errors)
 
         self.pushButton_inputFolder.clicked.connect(self.select_input_folder)
         self.pushButton_outputFolder.clicked.connect(self.select_output_folder)
@@ -84,6 +87,9 @@ class MainWindow(QMainWindow):
                     Path(item.path).suffix in valid_input_file_formats]
         self.files_model.files = sorted(chapters, key=natural_sort_key)
         self.files_model.layoutChanged.emit()
+
+    def display_drop_errors(self, error_msg: str):
+        self.statusBar.showMessage(error_msg)
 
     def select_output_folder(self):
         dir_to_open = self.lineEdit_outputFolder.text() or str(Path.home())
