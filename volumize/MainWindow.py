@@ -87,7 +87,7 @@ class Ui_MainWindow(object):
         spacerItem2 = QtWidgets.QSpacerItem(116, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
         self.horizontalLayout_2.addItem(spacerItem2)
         self.verticalLayout.addWidget(self.widget_2)
-        self.listView_chapters = QtWidgets.QListView(self.widget)
+        self.listView_chapters = DropListView(self.widget)
         self.listView_chapters.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
         self.listView_chapters.setObjectName("listView_chapters")
         self.verticalLayout.addWidget(self.listView_chapters)
@@ -132,4 +132,7 @@ class Ui_MainWindow(object):
         self.doubleSpinBox_volumeNo.setToolTip(_translate("MainWindow", "<html><head/><body><p>Volume number for current selection</p></body></html>"))
         self.pushButton_compile.setToolTip(_translate("MainWindow", "<html><head/><body><p>Archive the selected chapters</p></body></html>"))
         self.pushButton_compile.setText(_translate("MainWindow", "Compile"))
+
+
 from . import resources_rc
+from .drop_listview import DropListView

@@ -195,7 +195,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QListView" name="listView_chapters">
+        <widget class="DropListView" name="listView_chapters">
          <property name="selectionMode">
           <enum>QAbstractItemView::ExtendedSelection</enum>
          </property>
@@ -243,6 +243,13 @@
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>DropListView</class>
+   <extends>QListView</extends>
+   <header>.droplistview</header>
+  </customwidget>
+ </customwidgets>
  <resources>
   <include location="../resources/resources.qrc"/>
  </resources>

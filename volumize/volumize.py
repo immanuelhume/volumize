@@ -1,6 +1,5 @@
 # TODO drag and drop into file list view
 # TODO open file explorer upon completion option
-# TODO implement reverse engineering - unpack
 
 
 import os
@@ -9,12 +8,13 @@ import zipfile
 from pathlib import Path
 from typing import List
 
+from PyQt5 import uic
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 
 from .MainWindow import Ui_MainWindow
-from .utils import natural_sort_key, to_cbz
+from .utils import natural_sort_key, to_cbz, valid_input_file_formats
 
 
 class MainWindow(QMainWindow, Ui_MainWindow):
@@ -22,8 +22,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def __init__(self):
 
         super().__init__()
+        # uic.loadUi(f"{Path(__file__).parent / 'ui' / 'mainwindow.ui'}", self)
         self.setupUi(self)
         self.show()
+        self.lineEdit_inputFolder.setFocus()
         self.threadpool = QThreadPool()
 
         self.intially_locked_widgets = [
@@ -41,8 +43,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         ]
 
         # disable everything until a folder is selected
-        self.toggle_enabled(self.intially_locked_widgets)
-        self.lineEdit_inputFolder.textChanged.connect(self.enable_all)
+        # self.set_disabled()
+        # self.lineEdit_inputFolder.textChanged.connect(self.set_enabled)
+
+        self.listView_chapters.signals.dropped.\
+            connect(self.display_folder_contents)
+        self.listView_chapters.signals.error.connect(self.display_drop_errors)
 
         self.pushButton_inputFolder.clicked.connect(self.select_input_folder)
         self.pushButton_outputFolder.clicked.connect(self.select_output_folder)
@@ -52,12 +58,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         self.pushButton_compile.clicked.connect(self.handle_compile)
 
-    @staticmethod
-    def toggle_enabled(widgets: List):
-        for widget in widgets:
-            widget.setEnabled(not widget.isEnabled())
+    def set_disabled(self):
+        for widget in self.intially_locked_widgets:
+            widget.setEnabled(False)
 
-    def enable_all(self):
+    def set_enabled(self):
         # check if it's a valid path
         input_folder = self.lineEdit_inputFolder.text()
         if (os.path.isdir(input_folder)):
@@ -69,18 +74,22 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         input_folder = QFileDialog.getExistingDirectory(
             self, 'Select folder', dir_to_open)
         if input_folder:
-            self.display_selection(input_folder)
+            self.display_folder_contents(input_folder)
 
-    def display_selection(self, input_folder: 'Path'):
+    def display_folder_contents(self, input_folder: 'Path'):
         self.lineEdit_inputFolder.setText(input_folder)
         self.lineEdit_outputFolder.setText(input_folder)
         self.lineEdit_mangaTitle.setText(Path(input_folder).name)
 
         self.files_model.dirname = Path(input_folder)
-        chapters = [item for item in os.listdir(input_folder) if
-                    os.path.isdir(Path(input_folder) / item)]
+        chapters = [item.name for item in os.scandir(input_folder) if
+                    item.is_dir() or
+                    Path(item.path).suffix in valid_input_file_formats]
         self.files_model.files = sorted(chapters, key=natural_sort_key)
         self.files_model.layoutChanged.emit()
+
+    def display_drop_errors(self, error_msg: str):
+        self.statusBar.showMessage(error_msg)
 
     def select_output_folder(self):
         dir_to_open = self.lineEdit_outputFolder.text() or str(Path.home())
@@ -128,9 +137,9 @@ class ToCbzWorkerSignals(QObject):
 
 class ToCbzWorker(QRunnable):
 
-    def __init__(self, folders: List['Path'], destination: 'Path'):
+    def __init__(self, chapters: List['Path'], destination: 'Path'):
         super().__init__()
-        self.folders = folders
+        self.folders = chapters
         self.destination = destination
         self.signals = ToCbzWorkerSignals()
 
