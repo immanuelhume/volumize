@@ -3,18 +3,15 @@
 
 
 import os
-import re
-import zipfile
 from pathlib import Path
-from typing import List
 
-from PyQt5 import uic
-from PyQt5.QtCore import *
-from PyQt5.QtGui import *
-from PyQt5.QtWidgets import *
+from PyQt5 import Qt
+from PyQt5.QtCore import QAbstractListModel, QThreadPool
+from PyQt5.QtWidgets import QApplication, QFileDialog, QMainWindow
 
 from .MainWindow import Ui_MainWindow
-from .utils import natural_sort_key, to_cbz, valid_input_file_formats
+from .utils import natural_sort_key, valid_input_file_formats
+from .workers import ToCbzWorker
 
 
 class MainWindow(QMainWindow, Ui_MainWindow):
@@ -24,7 +21,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         super().__init__()
         # uic.loadUi(f"{Path(__file__).parent / 'ui' / 'mainwindow.ui'}", self)
         self.setupUi(self)
-        self.show()
         self.lineEdit_inputFolder.setFocus()
         self.threadpool = QThreadPool()
 
@@ -129,25 +125,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.doubleSpinBox_volumeNo.value() + 1)
 
 
-class ToCbzWorkerSignals(QObject):
-
-    completed = pyqtSignal(str)
-    progress = pyqtSignal(int)
-
-
-class ToCbzWorker(QRunnable):
-
-    def __init__(self, chapters: List['Path'], destination: 'Path'):
-        super().__init__()
-        self.folders = chapters
-        self.destination = destination
-        self.signals = ToCbzWorkerSignals()
-
-    @pyqtSlot()
-    def run(self):
-        to_cbz(self.folders, self.destination, self.signals)
-
-
 class FilesModel(QAbstractListModel):
 
     dirname = Path()
@@ -168,4 +145,5 @@ class FilesModel(QAbstractListModel):
 def main():
     app = QApplication([])
     window = MainWindow()
+    window.show()
     app.exec_()
