@@ -4,11 +4,13 @@
 
 import os
 from pathlib import Path
+from typing import Optional
 
-from PyQt5.QtCore import QAbstractListModel, Qt, QThreadPool
+from PyQt5.QtCore import QThreadPool
 from PyQt5.QtWidgets import QApplication, QFileDialog, QMainWindow
 
 from .MainWindow import Ui_MainWindow
+from .models import FilesModel
 from .utils import natural_sort_key, valid_input_file_formats
 from .workers import ToCbzWorker
 
@@ -115,6 +117,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             toCbzWorker.signals.progress.connect(lambda i:
                                                  self.progressBar.setValue(i))
             toCbzWorker.signals.completed.connect(self.one_volume_done)
+            toCbzWorker.signals.preparing.connect(self.progress_bar_prep)
             self.threadpool.start(toCbzWorker)
 
     def one_volume_done(self, msg: str):
@@ -123,22 +126,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.doubleSpinBox_volumeNo.setValue(
             self.doubleSpinBox_volumeNo.value() + 1)
 
-
-class FilesModel(QAbstractListModel):
-
-    dirname = Path()
-
-    def __init__(self, files=None):
-        super().__init__()
-        self.files = files or []
-
-    def data(self, index, role):
-        if role == Qt.DisplayRole:
-            filename = self.files[index.row()]
-            return filename
-
-    def rowCount(self, index):
-        return len(self.files)
+    def progress_bar_prep(self, prepping: bool, msg: Optional[str] = None):
+        if prepping:
+            self.progressBar.setTextVisible(True)
+            self.progressBar.setFormat(msg)
+        else:
+            self.progressBar.setTextVisible(False)
 
 
 def main():

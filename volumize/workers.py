@@ -1,4 +1,5 @@
 import os
+import random
 import shutil
 import zipfile
 from pathlib import Path
@@ -24,12 +25,21 @@ class ToCbzWorkerSignals(QObject):
 
     completed = pyqtSignal(str)
     progress = pyqtSignal(int)
+    preparing = pyqtSignal(bool, str)
 
 
 # BUG the loading bar sucks
 def to_cbz(chapters: List[Path],
            dest: Path,
            signals: ToCbzWorkerSignals = None):
+
+    prep_messages = [
+        'running for student council...',
+        'entering isekai...',
+    ]
+
+    signals.preparing.emit(True, random.choice(prep_messages))
+
     cbz_file = zipfile.ZipFile(dest, 'w')
     pages = []
     tmp_folder = dest.parent / 'tmp'
@@ -46,6 +56,8 @@ def to_cbz(chapters: List[Path],
                 zf.extractall(tmp_folder)
             pages.extend([(chapter.stem, file)
                           for file in os.scandir(tmp_folder / chapter.stem)])
+
+    signals.preparing.emit(False, '')
 
     total_n = len(pages)
     for n, (chapter, page) in enumerate(pages):
