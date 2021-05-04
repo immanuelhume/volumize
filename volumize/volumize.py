@@ -5,8 +5,7 @@
 import os
 from pathlib import Path
 
-from PyQt5 import Qt
-from PyQt5.QtCore import QAbstractListModel, QThreadPool
+from PyQt5.QtCore import QAbstractListModel, Qt, QThreadPool
 from PyQt5.QtWidgets import QApplication, QFileDialog, QMainWindow
 
 from .MainWindow import Ui_MainWindow

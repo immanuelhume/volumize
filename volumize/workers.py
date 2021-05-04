@@ -1,15 +1,10 @@
+import os
+import shutil
+import zipfile
 from pathlib import Path
 from typing import List
 
 from PyQt5.QtCore import QObject, QRunnable, pyqtSignal, pyqtSlot
-
-from .utils import to_cbz
-
-
-class ToCbzWorkerSignals(QObject):
-
-    completed = pyqtSignal(str)
-    progress = pyqtSignal(int)
 
 
 class ToCbzWorker(QRunnable):
@@ -23,3 +18,41 @@ class ToCbzWorker(QRunnable):
     @pyqtSlot()
     def run(self):
         to_cbz(self.folders, self.destination, self.signals)
+
+
+class ToCbzWorkerSignals(QObject):
+
+    completed = pyqtSignal(str)
+    progress = pyqtSignal(int)
+
+
+# BUG the loading bar sucks
+def to_cbz(chapters: List[Path],
+           dest: Path,
+           signals: ToCbzWorkerSignals = None):
+    cbz_file = zipfile.ZipFile(dest, 'w')
+    pages = []
+    tmp_folder = dest.parent / 'tmp'
+    os.mkdir(tmp_folder)
+    os.chdir(tmp_folder)
+
+    for n, chapter in enumerate(chapters):
+        if chapter.is_dir():
+            pages.extend([(chapter.name, file)
+                          for file in os.scandir(chapter)])
+        else:
+            # extract file contents first
+            with zipfile.ZipFile(chapter, 'r') as zf:
+                zf.extractall(tmp_folder)
+            pages.extend([(chapter.stem, file)
+                          for file in os.scandir(tmp_folder / chapter.stem)])
+
+    total_n = len(pages)
+    for n, (chapter, page) in enumerate(pages):
+        cbz_file.write(page, Path(chapter) / page.name)
+        if signals:
+            signals.progress.emit(int((100 * n) / total_n))
+    cbz_file.close()
+    if signals:
+        signals.completed.emit(f'{dest} created!')
+    shutil.rmtree(tmp_folder)
