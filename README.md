@@ -8,4 +8,4 @@ It's named volumize since the only usage is probably to compile individual manga
 2. Running `pip install .` should install PyQt5 which is the only dependency.
 3. The app can be started with `python -m volumize`
 
-![](https://github.com/immanuelhume/mangodl/blob/master/docs/volumize-demo.png)
+![](https://github.com/immanuelhume/volumize/blob/master/docs/volumize-demo.png)
