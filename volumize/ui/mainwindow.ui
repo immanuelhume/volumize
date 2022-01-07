@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>394</width>
-    <height>552</height>
+    <width>400</width>
+    <height>565</height>
    </rect>
   </property>
   <property name="contextMenuPolicy">
@@ -45,6 +45,17 @@
         <property name="icon">
          <iconset resource="../resources/resources.qrc">
           <normaloff>:/icons/folder-plus.png</normaloff>:/icons/folder-plus.png</iconset>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QToolButton" name="toolButton_refreshList">
+        <property name="text">
+         <string/>
+        </property>
+        <property name="icon">
+         <iconset resource="../resources/resources.qrc">
+          <normaloff>:/icons/view-refresh.png</normaloff>:/icons/view-refresh.png</iconset>
         </property>
        </widget>
       </item>

@@ -3,5 +3,6 @@
     <qresource prefix="icons">
         <file alias="folder-plus.png">folder-plus.png</file>
         <file alias="folder-open.png">folder-open.png</file>
+        <file alias="view-refresh.png">view-refresh.png</file>
     </qresource>
 </RCC>

@@ -53,6 +53,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         self.pushButton_compile.clicked.connect(self.handle_compile)
 
+        self.toolButton_refreshList.clicked.connect(self.handle_refresh)
+
     def set_disabled(self):
         for widget in self.intially_locked_widgets:
             widget.setEnabled(False)
@@ -122,6 +124,14 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.progressBar.reset()
         self.doubleSpinBox_volumeNo.setValue(
             self.doubleSpinBox_volumeNo.value() + 1)
+
+    def handle_refresh(self):
+        input_folder = self.lineEdit_inputFolder.text()
+        if not (os.path.isdir(input_folder)): 
+            self.statusBar.showMessage(f"\"{input_folder}\" is not a valid directory.") 
+            return
+        self.display_folder_contents(input_folder)
+        self.statusBar.showMessage("Folder refreshed!")
 
 
 class FilesModel(QAbstractListModel):
